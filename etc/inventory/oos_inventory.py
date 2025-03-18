@@ -18,6 +18,7 @@ def parse_inventory(inventory_template_dir, config):
                      'mysql_root_password': config.get('environment', 'mysql_root_password'),
                      'mysql_project_password': config.get('environment', 'mysql_project_password'),
                      'rabbitmq_password': config.get('environment', 'rabbitmq_password'),
+                     'redis_password': config.get('environment', 'redis_password'),
                      'project_identity_password': config.get('environment', 'project_identity_password'),
                      'enabled_service': config.get('environment', 'enabled_service').split(','),
                      'neutron_provider_interface_name': config.get('environment', 'neutron_provider_interface_name'),

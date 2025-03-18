@@ -29,6 +29,7 @@
       shell: |
         cat << EOF >> /etc/redis.conf
         bind {{ hostvars['controller']['ansible_default_ipv4']['address'] }}
+        requirepass {{ redis_password }}
         EOF
 
     - name: Initialize config file
@@ -56,7 +57,7 @@
         [storage]
         # coordination_url is not required but specifying one will improve
         # performance with better workload division across workers.
-        coordination_url = redis://{{ hostvars['controller']['ansible_default_ipv4']['address'] }}:6379
+        coordination_url = redis://:{{ redis_password }}@{{ hostvars['controller']['ansible_default_ipv4']['address'] }}:6379
         file_basepath = /var/lib/gnocchi
         driver = file
         EOF
