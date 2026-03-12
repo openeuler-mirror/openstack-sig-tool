@@ -4,12 +4,12 @@ from packaging import version as p_version
 import requests
 
 
-def get_gitee_project_tree(owner, project, branch, access_token=None):
-    """Get project content tree from gitee"""
+def get_atomgit_project_tree(owner, project, branch, access_token=None):
+    """Get project content tree from atomgit"""
     headers = {
         'Content-Type': 'application/json;charset=UTF-8',
     }
-    url = 'https://gitee.com/api/v5/repos/%s/%s/git/trees/%s' % (owner, project, branch)
+    url = 'https://atomgit.com/api/v5/repos/%s/%s/git/trees/%s' % (owner, project, branch)
     if access_token:
         url = url + '?access_token=%s' % access_token
     try:
@@ -20,10 +20,10 @@ def get_gitee_project_tree(owner, project, branch, access_token=None):
         return None
 
 
-def get_gitee_project_version(owner, project, branch, access_token=None):
+def get_atomgit_project_version(owner, project, branch, access_token=None):
     """Get project version"""
     version = ''
-    file_tree = get_gitee_project_tree(owner, project, branch, access_token)
+    file_tree = get_atomgit_project_tree(owner, project, branch, access_token)
     for file in file_tree['tree']:
         if re.search(r'\.(tar\.gz|tar\.bz2|zip|tgz)$', file['path']):
             sub_str = re.split(r'\.(tar\.gz|tar\.bz2|zip|tgz)$', file['path'])[0]
@@ -41,10 +41,9 @@ def has_branch(owner, project, branch, access_token=None):
     headers = {  
         'Content-Type': 'application/json;charset=UTF-8',  
     }  
-    url = f'https://gitee.com/api/v5/repos/{owner}/{project}/branches/{branch}'  
+    url = f'https://api.gitcode.com/api/v5/repos/{owner}/{project}/branches/{branch}'  
     if access_token:  
         url += f'?access_token={access_token}'  
-      
     try:  
         response = requests.get(url, headers=headers)  
         if response.status_code == 200:  
@@ -58,10 +57,10 @@ def has_branch(owner, project, branch, access_token=None):
 
 
 def get_user_info(token):
-    user_info_url = 'https://gitee.com/api/v5/user?access_token=%s' % token
+    user_info_url = 'https://atomgit.com/api/v5/user?access_token=%s' % token
     user_info = requests.get(user_info_url).json()
-    gitee_user = user_info['login']
+    atomgit_user = user_info['login']
     if not user_info.get('email'):
-        return gitee_user, None
-    gitee_email = user_info['email'] if '@' in user_info['email'] else None
-    return gitee_user, gitee_email
+        return atomgit_user, None
+    atomgit_email = user_info['email'] if '@' in user_info['email'] else None
+    return atomgit_user, atomgit_email

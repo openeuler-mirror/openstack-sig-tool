@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 from packaging import version as p_version
 
-from oos.common import gitee,utils
+from oos.common import atomgit,utils
 
 from bs4 import BeautifulSoup
 import requests
@@ -18,7 +18,7 @@ class CountDependence(object):
         if not Path(location).exists():
             raise Exception("The cache folder doesn't exist")
         self.location = location
-        self.token = token if token else os.environ.get("GITEE_PAT")
+        self.token = token if token else os.environ.get("ATOMGIT_PAT")
 
     def _generate_without_compare(self, file_list):
         with open(self.output, "w") as csv_file:
@@ -40,10 +40,12 @@ class CountDependence(object):
                     ])
 
     def _get_repo_version(self, repo_name, compare_branch):
-        print('fetch %s info from gitee, branch: %s' % (repo_name, compare_branch))
-        if not gitee.has_branch('src-openeuler', repo_name, compare_branch, self.token):
+        print('fetch %s info from atomgit, branch: %s' % (repo_name, compare_branch))
+        if not atomgit.has_branch('src-openeuler', repo_name, compare_branch, self.token):
+            print('repo %s doesn\'t exist' % repo_name)
             return '', False
-        repo_version = gitee.get_gitee_project_version('src-openeuler', repo_name, compare_branch, self.token)
+        print('branch %s exists, continue to fetch version' % compare_branch)
+        repo_version = atomgit.get_atomgit_project_version('src-openeuler', repo_name, compare_branch, self.token)
         return repo_version, True
 
     def _get_version_and_status(self, repo_name, project_version, project_eq_version,
@@ -51,23 +53,24 @@ class CountDependence(object):
         if not repo_name:
             return '', 'Need Create Repo'
         repo_version, has_branch = self._get_repo_version(repo_name, compare_branch)
+        print('repo version: %s,project version: %s' % (repo_version, project_version))
         if not has_branch:
             return '', 'Need Create Branch'
         if not repo_version:
             return '', 'Need Init Branch'
-        if p_version.parse(repo_version) == p_version.parse(project_version):
+        if p_version.parse(str(repo_version)) == p_version.parse(str(project_version)):
             return repo_version, 'OK'
         if project_upper_version:
-            if p_version.parse(repo_version) > p_version.parse(project_upper_version):
+            if p_version.parse(str(repo_version)) > p_version.parse(str(project_upper_version)):
                 return repo_version, 'Need Downgrade'
         else:
-            if p_version.parse(repo_version) > p_version.parse(project_version):
+            if p_version.parse(str(repo_version)) > p_version.parse(str(project_version)):
                 if project_version and project_version == project_eq_version:
                     status = 'Need Downgrade'
                 elif repo_version not in project_ne_version:
                     if not project_lt_version:
                         status = 'OK'
-                    elif p_version.parse(repo_version) < p_version.parse(project_lt_version):
+                    elif p_version.parse(str(repo_version)) < p_version.parse(str(project_lt_version)):
                         status = 'OK'
                     else:
                         status = 'Need Downgrade'
@@ -196,7 +199,7 @@ class Comp:
         :param branch: 分支
         :type branch: str
         '''
-        url = 'https://gitee.com/api/v5/repos/src-openeuler/%s/contents/' % repo_name
+        url = 'https://atomgit.com/api/v5/repos/src-openeuler/%s/contents/' % repo_name
         headers = {
             'Content-Type': 'application/json;charset=UTF-8',
         }
@@ -411,7 +414,7 @@ def group():
 @click.option('-cf', '--compare-from', default='master', help='The base branch which will be compared.')
 @click.option('-cb', '--compare-branch', default='master', help='Branch to compare with')
 @click.option('-o', '--output', default='result', help='Output file name, default: result.csv')
-@click.option('-t', '--token', help='Personal gitee access token used for fetching info from gitee')
+@click.option('-t', '--token', help='Personal atomgit access token used for fetching info from atomgit')
 @click.argument('location', type=click.Path(dir_okay=True))
 def generate(compare, compare_from, compare_branch, output, token, location):
     myobj = CountDependence(output, token, location)
@@ -425,7 +428,7 @@ def generate(compare, compare_from, compare_branch, output, token, location):
 @click.option('-r', '--release', help='Openstack release name')
 @click.option('-p', '--packages', help='Specfigy file list range')
 @click.option('-a', '--append', is_flag=True, default=False, help='Append to the \'compare_result\' file')
-@click.option('-t', '--token', help='Personal gitee access token used for fetching info from gitee')
+@click.option('-t', '--token', help='Personal atomgit access token used for fetching info from atomgit')
 @click.argument('location', type=click.Path(dir_okay=True))
 def compare(branches, output, release, packages, append, token, location):
     comp = Comp(branches, output, release, packages, append, token, location)
