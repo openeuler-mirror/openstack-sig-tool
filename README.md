@@ -10,7 +10,7 @@ oos(openEuler OpenStack SIG)是OpenStack SIG提供的命令行工具。该工具
 
 oos在不断开发中，用户可以使用pypi上已发布的稳定版
 
-```
+``` shell script
 pip install openstack-sig-tool
 ```
 
@@ -19,18 +19,20 @@ pip install openstack-sig-tool
 分别支持单个生成 RPM Spec 和批量生成 RPM Spec，可选是否 push 并提交 pr 到 OpenEuler 社区。
 
 - 生成软件包的RPM Spec
+
 ```shell script
 oos spec create --name stevedore --version 1.28.0
 ```
 
 - 更新软件包的RPM Spec
-```
+
+``` shell script
 oos spec update --name stevedore --version 2.0.0
 ```
 
 其他支持的参数有：
 
-```
+``` shell script
 -n, --name
     指定软件包的名字
 -v, --version
@@ -46,18 +48,20 @@ oos spec update --name stevedore --version 2.0.0
 ```
 
 - 构建RPM软件包
-```
+
+``` shell script
 oos spec build stevedore
 ```
 
 - 复制软件仓下文件到rpmbulid目录
-```
+
+``` shell script
 oos spec cp
 ```
 
 其他支持的参数有：
 
-```
+``` shell script
 -c, --clear
     删除rpmbuild目录
 -b, --build
@@ -72,118 +76,118 @@ oos spec cp
 
 1. 调用脚本，生成缓存文件，默认存放在`train_cached_file`目录
 
-```
-cd tools/oos/scripts
-python3 generate_dependence.py train
-本命令默认会生成Train版本SIG支持的所有OpenStack服务，用户也可以根据自己需求，指定openstack项目，例如
-python3 generate_dependence.py --projects nova,cinder train
-```
+    ``` shell script
+    cd tools/oos/scripts
+    export OOS_CONF_DIR=$(pwd)/etc
+    python3 generate_dependence.py train
+    本命令默认会生成Train版本SIG支持的所有OpenStack服务，用户也可以根据自己需求，指定openstack项目，例如
+    python3 generate_dependence.py --projects nova,cinder train
+    ```
 
 2. 调用oos命令，生成依赖分析结果
 
-```
-oos dependence generate train_cached_file
-```
+    ``` shell script
+    oos dependence generate train_cached_file
+    ```
 
-其他支持的参数有：
+    其他支持的参数有：
 
-```
--c, --compare
-    结果是否与openeuler社区仓库进行比对，生成建议
--cb, --compare-branch
-    指定openEuler比对的仓库分支，默认是master
--cf, --compare-from
-    指定openEuler比对的仓库基础分支，用来给出sync分支建议，默认是master
--t, --token
-    如果使用了-c，需要同时指定gitee token，否则gitee可能会拒接访问。
-    或者配置环境变量GITEE_PAT也行。
--o, --output
-    指定命令行生成的文件名，默认为result.csv
-```
+    ``` shell script
+    -c, --compare
+        结果是否与openeuler社区仓库进行比对，生成建议
+    -cb, --compare-branch
+        指定openEuler比对的仓库分支，默认是master
+    -cf, --compare-from
+        指定openEuler比对的仓库基础分支，用来给出sync分支建议，默认是master
+    -t, --token
+        如果使用了-c，需要同时指定atomgit token，否则atomgit 可能会拒接访问。
+        或者配置环境变量ATOMGIT_PAT也行。
+    -o, --output
+        指定命令行生成的文件名，默认为result.csv
+    ```
 
-该命令运行完后，根目录下会生成1个结果文件，默认为`result.csv`。
-
+    该命令运行完后，根目录下会生成1个结果文件，默认为`result.csv`。
 
 3. 调用oos命令，比较openEuler软件仓中不同分支的版本是否满足依赖要求
 
-由于网络等原因，请求出现报错的软件仓会记录在最后两行。
-第一行列出了依赖文件名，可使用-p参数再次执行命令。
-第二行列出了openEuler软件仓名称及简单的错误原因，方便访问查看仓库情况。
+    由于网络等原因，请求出现报错的软件仓会记录在最后两行。
+    第一行列出了依赖文件名，可使用-p参数再次执行命令。
+    第二行列出了openEuler软件仓名称及简单的错误原因，方便访问查看仓库情况。
 
-```
-oos dependence compare train_cached_file
-```
+    ``` shell script
+    oos dependence compare train_cached_file
+    ```
 
-其他支持的参数有：
+    其他支持的参数有：
 
-```
--b, --branches
-    指定openEuler需要对比的仓库分支，默认是master，多个分支要求以空格分隔
--o, --output
-    指定命令行生成的文件名，默认为compare_result.csv
--r, --release
-    指定release名称，如wallaby antelope，获取openstack release网页中的软件包版本
--p, --packages
-    指定需要分析的软件包名，不包含后缀，自动添加.json后缀
--a, --append
-    追加模式写入文件，默认不追加
--t, --token
-    访问gitee的token，不使用为匿名用户，访问API次数会被限制。
-```
+    ``` shell script
+    -b, --branches
+        指定openEuler需要对比的仓库分支，默认是master，多个分支要求以空格分隔
+    -o, --output
+        指定命令行生成的文件名，默认为compare_result.csv
+    -r, --release
+        指定release名称，如wallaby antelope，获取openstack release网页中的软件包版本
+    -p, --packages
+        指定需要分析的软件包名，不包含后缀，自动添加.json后缀
+    -a, --append
+        追加模式写入文件，默认不追加
+    -t, --token
+        访问atomgit的token，不使用为匿名用户，访问API次数会被限制。
+    ```
 
-命令举例：
-```
-oos dependence compare 2023.1_cached_file -b 'master openEuler-23.03' -o my_result -r antelope -p 'aodh aodhclient autobahn'
-```
+    命令举例：
 
-生成csv文件示例及解释：
+    ``` shell script
+    oos dependence compare 2023.1_cached_file -b 'master openEuler-23.03' -o my_result -r antelope -p 'aodh aodhclient autobahn'
+    ```
 
-|Name|RepoName|SIG|eq Version|ge Version|lt Version|ne Version|Upper Version|of community|master|status|openEuler-23.03|status|
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-|asgiref|python-asgiref|sig-python-modules||3.3.2|4|[]|3.5.2|[]|3.7.2|ge-match lt-match downgrade max3.5.2|3.5.2|ge-match lt-match up-match|
-|openstack-cyborg|openstack-cyborg|sig-openstack|10.0.0|||[]||['10.0.0']|[no tar]||8.0.0|specify ['10.0.0']|
+    生成csv文件示例及解释：
 
-- Name: json文件名称
-- RepoName: Name在openEuler对应的仓库名
-- eq/ge/lt/ne/Upper Version: json文件中version_dict对应的版本
-- of community: OpenStack release网页列出的软件版本，[]表示无该软件包
-- branch和status: 如上表title中`masteer` `openEuler-23.03`为指定分支名称，
-表格中为软件包在该分支的版本，status为对应分支的软件包版本和eq/ge/lt/ne/Upper Version的比较结果
+    |Name|RepoName|SIG|eq Version|ge Version|lt Version|ne Version|Upper Version|of community|master|status|openEuler-23.03|status|
+    |---|---|---|---|---|---|---|---|---|---|---|---|---|
+    |asgiref|python-asgiref|sig-python-modules||3.3.2|4|[]|3.5.2|[]|3.7.2|ge-match lt-match downgrade max3.5.2|3.5.2|ge-match lt-match up-match|
+    |openstack-cyborg|openstack-cyborg|sig-openstack|10.0.0|||[]||['10.0.0']|[no tar]||8.0.0|specify ['10.0.0']|
 
-如上表中:  
-`asgiref`的版本要求为大于等于3.3.2，小于4，上限为3.5.2，
-master分支3.7.2，高于上限要求，openEuler-23.03分支3.5.2，满足版本要求。  
-`openstack-cyborg`属于社区指定的软件包，要求版本为10.0.0。指定分支均不满足要求
+    - Name: json文件名称
+    - RepoName: Name在openEuler对应的仓库名
+    - eq/ge/lt/ne/Upper Version: json文件中version_dict对应的版本
+    - of community: OpenStack release网页列出的软件版本，[]表示无该软件包
+    - branch和status: 如上表title中`masteer` `openEuler-23.03`为指定分支名称，
+    表格中为软件包在该分支的版本，status为对应分支的软件包版本和eq/ge/lt/ne/Upper Version的比较结果
+
+    如上表中:  
+    `asgiref`的版本要求为大于等于3.3.2，小于4，上限为3.5.2，
+    master分支3.7.2，高于上限要求，openEuler-23.03分支3.5.2，满足版本要求。  
+    `openstack-cyborg`属于社区指定的软件包，要求版本为10.0.0。指定分支均不满足要求
 
 4. 调用oos命令，按行读取文件内容，生成list，并比较两个list的特定差异，
 默认生成comp_result.csv文件存放比较结果
 
-```
-oos dependence compare-list file1 file2
-```
+    ``` shell script
+    oos dependence compare-list file1 file2
+    ```
 
-其他支持的参数有：
-```
--o, --output
-    指定命令行生成的文件名，默认为comp_result.csv
-```
+    其他支持的参数有：
 
-file1中有ansible-lint、babel等软件仓名字，file2中有ansible-lint、
-avro-python3等软件仓名字，比较两个软件仓差异结果如下：
+    ``` shell script
+    -o, --output
+        指定命令行生成的文件名，默认为comp_result.csv
+    ```
 
-|Right|Left|
-|---|---|
-|ansible-lint|ansible-lint|
-|***|avro-python3|
-|babel|***|
-|***|crudini|
-|***|dibbler|
-|diskimage-builder|diskimage-builder|
-|future|***|
-|gnocchi|gnocchi|
-|***|google-auth-httplib2|
+    file1中有ansible-lint、babel等软件仓名字，file2中有ansible-lint、
+    avro-python3等软件仓名字，比较两个软件仓差异结果如下：
 
-
+    |Right|Left|
+    |---|---|
+    |ansible-lint|ansible-lint|
+    |***|avro-python3|
+    |babel|***|
+    |***|crudini|
+    |***|dibbler|
+    |diskimage-builder|diskimage-builder|
+    |future|***|
+    |gnocchi|gnocchi|
+    |***|google-auth-httplib2|
 
 ## 获取OpenStack SIG PR列表
 
@@ -191,45 +195,48 @@ avro-python3等软件仓名字，比较两个软件仓差异结果如下：
 
 1. 调用oos命令， 将PR信息梳理成列表输出
 
-```
-oos repo pr-fetch -r REPO -t gitee-pat
-```
+    ``` shell script
+    oos repo pr-fetch -r REPO -t atomgit-pat
+    ```
 
-该命令所支持的参数如下：
+    该命令所支持的参数如下：
 
-```
--t, --gitee-pat
-    [可选] 个人Gitee账户personal access token，可以使用GITEE_PAT环境变量指定
--r, --repo
-    [可选] 组织仓库的名称，默认为组织下的所有仓库，格式为openeuler/xxx,src-openeuler/xxx
--o, --output
-    [可选] 输出文件名，默认为prs.yaml
-```
+    ``` shell script
+    -t, --atomgit-pat
+        [可选] 个人Atomgit账户personal access token，可以使用ATOMGIT_PAT环境变量指定
+    -r, --repo
+        [可选] 组织仓库的名称，默认为组织下的所有仓库，格式为openeuler/xxx,src-openeuler/xxx
+    -o, --output
+        [可选] 输出文件名，默认为prs.yaml
+    ```
 
-该命令运行完后，目录下会生成1个结果文件，默认为`prs.yaml`。
+    该命令运行完后，目录下会生成1个结果文件，默认为`prs.yaml`。
 
 ## 创建软件仓
 
 可以使用`oos repo create`命令创建openeuler或者src-openeuler软件仓
 
-- 在openeuler或者src-openeuler创建软件仓，需要提供要创建仓库的软件仓列表`.csv`文件或者指定单个软件仓，以及Gitee的账号等信息：
+- 在openeuler或者src-openeuler创建软件仓，需要提供要创建仓库的软件仓列表`.csv`文件或者指定单个软件仓，以及Atomgit的账号等信息：
+
 ```shell script
-oos repo create --repo autopage:python-autopage -t GITEE_PAT
+oos repo create --repo autopage:python-autopage -t ATOMGIT_PAT
 ```
+
 或者指定`.csv`文件一次创建多个软件仓库，`.csv`包括pypi_name和repo_name两列：
+
 ```shell script
-oos repo create --repos-file ~/repos.cvs -t GITEE_PAT
+oos repo create --repos-file ~/repos.cvs -t ATOMGIT_PAT
 ```
 
 该命令所支持的参数如下：
 
-```
--t, --gitee-pat
-    [必选] 个人Gitee账户personal access token，可以使用GITEE_PAT环境变量指定
--e, --gitee-email
-    [可选] 个人Gitee账户email地址，可使用GITEE_EMAIL指定, 若在Gitee账户公开，可通过Token自动获取
--o, --gitee-org
-    [可选] repo所属的gitee组织名称，默认为src-openeuler
+``` shell script
+-t, --atomgit-pat
+    [必选] 个人Atomgit账户personal access token，可以使用ATOMGIT_PAT环境变量指定
+-e, --atomgit-email
+    [可选] 个人Atomgit账户email地址，可使用ATOMGIT_EMAIL指定, 若在Atomgit账户公开，可通过Token自动获取
+-o, --atomgit-org
+    [可选] repo所属的atomgit组织名称，默认为src-openeuler
 -r, --repo
     [可选] 软件仓名，和--repos-file参数二选一，格式为pypi_name:repo_name
 -rf, --repos-file
@@ -239,35 +246,37 @@ oos repo create --repos-file ~/repos.cvs -t GITEE_PAT
 -w, --work-branch
     [可选] 本地工作分支，默认为openstack-create-repo
 -dp, --do-push
-    [可选] 指定是否执行push到gitee仓库上并提交PR，如果不指定则只会提交到本地的仓库中
+    [可选] 指定是否执行push到atomgit仓库上并提交PR，如果不指定则只会提交到本地的仓库中
 ```
 
 ## 为软件仓创建分支
 
 可以使用`oos repo branch-create`命令为openeuler软件仓创建分支
 
-- 为软件仓创建分支，需要提供要创建分支的软件仓列表`.csv`文件或者指定单个软件仓名称，对应新建分支信息以及Gitee的账号等信息，
+- 为软件仓创建分支，需要提供要创建分支的软件仓列表`.csv`文件或者指定单个软件仓名称，对应新建分支信息以及Atomgit的账号等信息，
 以为openstack-nova仓创建openEuler-21.09分支为例：
+
 ```shell script
-oos repo branch-create --repo openstack-nova -b openEuler-21.09 protected master -t GITEE_PAT
+oos repo branch-create --repo openstack-nova -b openEuler-21.09 protected master -t ATOMGIT_PAT
 ```
 
-- 为软件仓批量创建多分支，需要提供要创建分支的软件仓列表`.csv`文件或者指定单个软件仓名称，对应新建分支信息以及Gitee的账号等信息，
+- 为软件仓批量创建多分支，需要提供要创建分支的软件仓列表`.csv`文件或者指定单个软件仓名称，对应新建分支信息以及Atomgit的账号等信息，
 以为repos.csv中软件仓创建openEuler-21.09分支和openEuler-22.03-LTS多分支为例，并提交pr为例：
+
 ```shell script
 oos repo branch-create --repos-file repos.csv -b openEuler-21.09 protected master 
--b openEuler-22.03-LTS protected openEuler-22.03-LTS-Next -t GITEE_PAT --do-push
+-b openEuler-22.03-LTS protected openEuler-22.03-LTS-Next -t ATOMGIT_PAT --do-push
 ```
 
 该命令所支持的参数如下：
 
-```
--t, --gitee-pat
-    [必选] 个人Gitee账户personal access token，可以使用GITEE_PAT环境变量指定
--e, --gitee-email
-    [可选] 个人Gitee账户email地址，可使用GITEE_EMAIL指定, 若在Gitee账户公开，可通过Token自动获取
--o, --gitee-org
-    [可选] repo所属的gitee组织名称，默认为src-openeuler
+``` shell script
+-t, --atomgit-pat
+    [必选] 个人Atomgit账户personal access token，可以使用ATOMGIT_PAT环境变量指定
+-e, --atomgit-email
+    [可选] 个人Atomgit账户email地址，可使用ATOMGIT_EMAIL指定, 若在Atomgit账户公开，可通过Token自动获取
+-o, --atomgit-org
+    [可选] repo所属的Atomgit组织名称，默认为src-openeuler
 -r, --repo
     [可选] 软件仓名，和--repos-file参数二选一
 -rf, --repos-file
@@ -280,34 +289,36 @@ oos repo branch-create --repos-file repos.csv -b openEuler-21.09 protected maste
 -w, --work-branch
     [可选] 本地工作分支，默认为openstack-create-branch
 -dp, --do-push
-    [可选] 指定是否执行push到gitee仓库上并提交PR，如果不指定则只会提交到本地的仓库中
+    [可选] 指定是否执行push到atomgit仓库上并提交PR，如果不指定则只会提交到本地的仓库中
 ```
 
 ## 为软件仓删除分支
 
 可以使用`oos repo branch-delete`命令为openeuler软件仓删除分支
 
-- 为软件仓删除分支，需要提供要删除分支的软件仓列表`.csv`文件或者指定单个软件仓名称，对应需要删除的分支信息以及Gitee的账号等信息，
+- 为软件仓删除分支，需要提供要删除分支的软件仓列表`.csv`文件或者指定单个软件仓名称，对应需要删除的分支信息以及Atomgit的账号等信息，
 以为openstack-nova仓删除openEuler-21.09分支为例：
+
 ```shell script
-oos repo branch-delete --repo openstack-nova -b openEuler-21.09 -t GITEE_PAT
+oos repo branch-delete --repo openstack-nova -b openEuler-21.09 -t ATOMGIT_PAT
 ```
 
-- 为软件仓批量删除多个分支，需要提供要删除分支的软件仓列表`.csv`文件或者指定单个软件仓名称，对应需要删除的分支信息以及Gitee的账号等信息，
+- 为软件仓批量删除多个分支，需要提供要删除分支的软件仓列表`.csv`文件或者指定单个软件仓名称，对应需要删除的分支信息以及Atomgit的账号等信息，
 以为repos.csv中软件仓删除openEuler-21.09分支和openEuler-22.03-LTS多分支为例，并提交pr为例：
+
 ```shell script
-oos repo branch-delete --repos-file repos.csv -b openEuler-21.09 -b openEuler-22.03-LTS -t GITEE_PAT --do-push
+oos repo branch-delete --repos-file repos.csv -b openEuler-21.09 -b openEuler-22.03-LTS -t ATOMGIT_PAT --do-push
 ```
 
 该命令所支持的参数如下：
 
-```
--t, --gitee-pat
-    [必选] 个人Gitee账户personal access token，可以使用GITEE_PAT环境变量指定
--e, --gitee-email
-    [可选] 个人Gitee账户email地址，可使用GITEE_EMAIL指定, 若在Gitee账户公开，可通过Token自动获取
--o, --gitee-org
-    [可选] repo所属的gitee组织名称，默认为src-openeuler
+``` shell script
+-t, --atomgit-pat
+    [必选] 个人Atomgit账户personal access token，可以使用ATOMGIT_PAT环境变量指定
+-e, --atomgit-email
+    [可选] 个人Atomgit账户email地址，可使用Atomgit_EMAIL指定, 若在Atomgit账户公开，可通过Token自动获取
+-o, --atomgit-org
+    [可选] repo所属的atomgit组织名称，默认为src-openeuler
 -r, --repo
     [可选] 软件仓名，和--repos-file参数二选一
 -rf, --repos-file
@@ -319,13 +330,14 @@ oos repo branch-delete --repos-file repos.csv -b openEuler-21.09 -b openEuler-22
 -w, --work-branch
     [可选] 本地工作分支，默认为openstack-delete-branch
 -dp, --do-push
-    [可选] 指定是否执行push到gitee仓库上并提交PR，如果不指定则只会提交到本地的仓库中
+    [可选] 指定是否执行push到atomgit仓库上并提交PR，如果不指定则只会提交到本地的仓库中
 ```
 
 ## 批量fork仓库
 
 可使用`oos repo fork`命令fork多个仓库
-```shell
+
+``` shell script
 oos repo fork <token> <names>
 
 oos repo fork ****** 'python-repo1 repo2'
@@ -333,25 +345,26 @@ oos repo fork ****** 'python-repo1 repo2'
 
 该命令所支持的参数如下：
 
-```
--o, --gitee-org
-    [可选] repo所属的gitee组织名称，默认为src-openeuler
+``` shell script
+-o, --atomgit-org
+    [可选] repo所属的atomgit组织名称，默认为src-openeuler
 ```
 
 ## 查看软件仓的各个分支的文件版本
 
 可使用`oos repo branch-version-list`命令查看某个软件仓的各个分支的文件版本
-```shell
-oos repo branch-version-list repo -t GITEE_PAT
+
+``` shell script
+oos repo branch-version-list repo -t ATOMGIT_PAT
 ```
 
 该命令所支持的参数如下：
 
-```
--t, --gitee-pat
-    [必选] 个人Gitee账户personal access token，可以使用GITEE_PAT环境变量指定
--o, --gitee-org
-    [可选] repo所属的gitee组织名称，默认为src-openeuler
+``` shell script
+-t, --atomgit-pat
+    [必选] 个人Atomgit账户personal access token，可以使用ATOMGIT_PAT环境变量指定
+-o, --atomgit-org
+    [可选] repo所属的atomgit组织名称，默认为src-openeuler
 -s, --suffix
     [可选] 文件的后缀，默认为.tar.gz
 -k, --keyword
@@ -360,7 +373,7 @@ oos repo branch-version-list repo -t GITEE_PAT
 
 ## 提交特定PR
 
-可使用`oos repo create-pr -t <GITEE_PAT> -m <comment> -a`命令，
+可使用`oos repo create-pr -t <ATOMGIT_PAT> -m <comment> -a`命令，
 将本地仓库当前分支的修改提交，并创建PR。该功能有一定限制，
 请仔细了解命令参数后再使用。
 
@@ -369,11 +382,12 @@ oos repo branch-version-list repo -t GITEE_PAT
 - PR默认读取`git config --list`中user.name做为创建PR时的username，不支持修改
 
 该命令所支持的参数如下：
-```
--t, --gitee-pat
-    [必选] 个人Gitee账户personal access token，可以使用GITEE_PAT环境变量指定
--o, --gitee-org
-    [可选] repo所属的gitee组织名称，默认为src-openeuler
+
+``` shell script
+-t, --atomgit-pat
+    [必选] 个人Atomgit账户personal access token，可以使用ATOMGIT_PAT环境变量指定
+-o, --atomgit-org
+    [可选] repo所属的atomgit组织名称，默认为src-openeuler
 -b, --remote-branch
     [可选] PR提交目标分支的名称，默认使用本地当前分支名称
 -a, --add-commit
@@ -384,18 +398,20 @@ oos repo branch-version-list repo -t GITEE_PAT
 ```
 
 ## 合并特定PR
-可使用`oos repo pr-merge -t <GITEE_PAT> -a <author> -n <num>`命令，
+
+可使用`oos repo pr-merge -t <ATOMGIT_PAT> -a <author> -n <num>`命令，
 批量合并PR，适用于LTS版本开发，向其他分支使用/sync命令同步的PR。
 合并方法为评论`/lgtm`和`/approve`
 
 建议执行命令后再查看下相关PR，相关链接会在打印输出。
 
 该命令所支持的参数如下：
-```
--t, --gitee-pat
-    [必选] 个人Gitee账户personal access token，可以使用GITEE_PAT环境变量指定
--o, --gitee-org
-    [可选] repo所属的gitee组织名称，默认为src-openeuler
+
+``` shell script
+-t, --atomgit-pat
+    [必选] 个人Atomgit账户personal access token，可以使用ATOMGIT_PAT环境变量指定
+-o, --atpmgit-org
+    [可选] repo所属的atomgit组织名称，默认为src-openeuler
 -s, --sig
     [可选] PR所属sig，默认sig-openstack
 -a, --author
@@ -415,7 +431,8 @@ oos repo branch-version-list repo -t GITEE_PAT
 按照分支开发原则，新分支从Next分支拉取。
 
 该命令所支持的参数如下：
-```
+
+``` shell script
 -i, --inherit
     [可选] 标记是否为继承
 -r, --reference
@@ -434,7 +451,8 @@ oos repo branch-version-list repo -t GITEE_PAT
 需要在release-management仓库multi_version目录下执行，根据输入文件添加EBS工程初始化内容。
 
 文件格式为首行分支名称，其他行为仓库名称，举例如下
-```txt
+
+```text
 Multi-Version_OpenStack-Wallaby_openEuler-22.03-LTS-SP4
 PyYAML
 ansible-lint
@@ -442,25 +460,27 @@ ansible-lint
 ```
 
 该命令所支持的参数如下：
-```
+
+``` shell script
 -p, --path
     [必选] 标仓库名列表文件，格式为首行分支名称，其他行为仓库名称
 ```
-
 
 ## 华为弹性云服务器操作
 
 支持start、shutdown、reinstall、changeos操作
 
 - 查看环境信息命令
-```
+
+``` shell script
 oos env list
 ```
+
 该命令所支持参数如下：
 不带任何参数，查看使用oos工具部署OpenStack的环境信息  
 可参考[基于OpenStack SIG开发工具oos快速部署](https://openeuler.gitee.io/openstack/install/openEuler-22.03-LTS-SP2/OpenStack-wallaby/#openstack-sigoos)
 
-```
+``` shell script
 -r, --remote
     [可选] 查看所有弹性云服务器，显式服务器IP、ID、Name、Status
 -i, --image
@@ -482,21 +502,26 @@ oos env list
 ```
 
 - 启动云服务器
-```
+
+``` shell script
 oos env start <x.x.x.x>
 ```
 
 - 关闭云服务器
-```
+
+``` shell script
 oos env stop <x.x.x.x>
 ```
 
 - 重装云服务器
-```
+
+``` shell script
 oos env reinstall <x.x.x.x>
 ```
+
 该命令所支持参数如下：
-```
+
+``` shell script
 -p, --pwd
     [可选] 指定云服务器重装后的登陆密码，不指定为原密码
 -f, --file
@@ -504,11 +529,14 @@ oos env reinstall <x.x.x.x>
 ```
 
 - 切换弹性云服务器操作系统
-```
+
+``` shell script
 oos env changeos
 ```
+
 该命令所支持参数如下：
-```
+
+``` shell script
 -s, --server-id
     [可选] 指定弹性云服务器的ID，该参数会覆盖ip参数
 -i, --image-id
@@ -522,11 +550,14 @@ oos env changeos
 ```
 
 - 创建弹性云服务器
-```
+
+``` shell script
 oos env create-server
 ```
+
 该命令所支持参数如下：
-```
+
+``` shell script
 -f, --flavor
     [必选] 指定服务器规格
 -i, --image-id
@@ -544,16 +575,20 @@ oos env create-server
 ```
 
 - 删除弹性云服务器
-```
+
+``` shell script
 oos env delete-server <ip> <id>
 ```
 
 - 查看、绑定、解绑安全组和弹性云服务器
-```
+
+``` shell script
 oos env sg-relation <server-ip>
 ```
+
 该命令所支持参数如下：
-```
+
+``` shell script
 -a, --associate
     [可选] 绑定安全组
 -d, --disassociate
@@ -561,21 +596,27 @@ oos env sg-relation <server-ip>
 ```
 
 - 创建或删除安全组
-```
+
+``` shell script
 oos env sg-operate <name>
 ```
+
 该命令所支持参数如下：
-```
+
+``` shell script
 -i, --is-delete
     [可选] 标记创建或删除安全组，默认创建安全组
 ```
 
 - 创建或删除安全组安全组规则
-```
+
+``` shell script
 oos env sr-operate <name>
 ```
+
 该命令所支持参数如下：
-```
+
+``` shell script
 -i, --ip
     [可选] 安全组规则ip，ip格式为CIDR
 -n, --name
@@ -594,16 +635,20 @@ oos env sr-operate <name>
     [可选] 删除安全组规则，与其他参数同时使用时优先删除规则
 ```
 
-
 ## 环境和依赖
+
 上述`oos spec build`命令需要依赖于`rpmbuild`工具，因此需要安装以下相关软件包：
+
 ```shell script
 yum install rpm-build rpmdevtools
 ```
+
 同时，需要预先准备好`rpmbuild`命令所需的相关工作目录，执行如下命令：
+
 ```shell script
 rpmdev-setuptree
 ```
+
 在执行`oos spec build`命令时可以指定`--build-root`参数为`rpmbuild`工作目录的根目录，默认为当前用户目录下`rpmbuild/`目录。
 
 另外，为了便于使用该工具，可以使用`Docker`快速构建一个打包环境，具体详见`docker/`目录下的[README](https://gitee.com/openeuler/openstack/blob/master/tools/docker/README.md).

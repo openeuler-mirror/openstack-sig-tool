@@ -10,14 +10,14 @@ from oos.common import utils
 
 
 class PkgGitRepo(object):
-    def __init__(self, gitee_pat=None, gitee_org='src-openeuler',
-                 gitee_user=None, gitee_email=None,
+    def __init__(self, atomgit_pat=None, atomgit_org='src-openeuler',
+                 atomgit_user=None, atomgit_email=None,
                  pypi_name=None, repo_name=None):
         self.pypi_name = pypi_name
-        self.gitee_org = gitee_org
-        self.gitee_pat = gitee_pat
-        self.gitee_user = gitee_user
-        self.gitee_email = gitee_email
+        self.atomgit_org = atomgit_org
+        self.atomgit_pat = atomgit_pat
+        self.atomgit_user = atomgit_user
+        self.atomgit_email = atomgit_email
         self.not_found = False
         self.branch_not_found = False
         self.repo_dir = ''
@@ -44,23 +44,23 @@ class PkgGitRepo(object):
 
     def fork_repo(self, repo_name):
         try:
-            url = "https://gitee.com/api/v5/repos/%s/%s/forks" % (
-                self.gitee_org, repo_name)
+            url = "https://atomgit.com/api/v5/repos/%s/%s/forks" % (
+                self.atomgit_org, repo_name)
             resp = requests.request("POST", url,
-                                    data={"access_token": self.gitee_pat})
+                                    data={"access_token": self.atomgit_pat})
             if resp.status_code == 404:
-                click.echo("Repo not found for: %s/%s" % (self.gitee_org,
+                click.echo("Repo not found for: %s/%s" % (self.atomgit_org,
                                                           repo_name),
                            err=True)
                 self.not_found = True
             elif resp.status_code != 201:
                 click.echo("Fork repo %s failed, %s" % (repo_name, resp.text), err=True)
         except requests.RequestException as e:
-            click.echo("HTTP request to gitee failed: %s" % e, err=True)
+            click.echo("HTTP request to atomgit failed: %s" % e, err=True)
 
     def clone_repo(self, src_dir):
-        clone_url = "https://gitee.com/%s/%s" % (
-            self.gitee_user, self.repo_name)
+        clone_url = "https://atomgit.com/%s/%s" % (
+            self.atomgit_user, self.repo_name)
         click.echo("Cloning source repo from: %s" % clone_url)
         repo_dir = os.path.join(src_dir, self.repo_name)
         if os.path.exists(repo_dir):
@@ -69,29 +69,29 @@ class PkgGitRepo(object):
         self.repo_dir = os.path.join(src_dir, self.repo_name)
 
     def add_branch(self, src_branch, dest_branch, reuse_branch=False):
-        url = "https://gitee.com/api/v5/repos/{gitee_org}/{repo_name}/" \
-              "branches/{dest_branch}".format(gitee_org=self.gitee_org,
+        url = "https://atomgit.com/api/v5/repos/{atomgit_org}/{repo_name}/" \
+              "branches/{dest_branch}".format(atomgit_org=self.atomgit_org,
                                               repo_name=self.repo_name,
                                               dest_branch=dest_branch)
         resp = requests.request("GET", url)
         if resp.status_code == 404:
             click.echo("Branch: %s not found for project: %s/%s" %
-                       (dest_branch, self.gitee_org, self.repo_name),
+                       (dest_branch, self.atomgit_org, self.repo_name),
                        err=True)
             self.branch_not_found = True
             return
-        click.echo("Adding branch for %s/%s" % (self.gitee_org, self.repo_name))
+        click.echo("Adding branch for %s/%s" % (self.atomgit_org, self.repo_name))
         cmd = 'cd %(repo_dir)s; ' \
-              'git config --global user.email "%(gitee_email)s";' \
-              'git config --global user.name "%(gitee_user)s";' \
-              'git remote add upstream "https://gitee.com/%(gitee_org)s/' \
+              'git config --global user.email "%(atomgit_email)s";' \
+              'git config --global user.name "%(atomgit_user)s";' \
+              'git remote add upstream "https://atomgit.com/%(atomgit_org)s/' \
               '%(repo_name)s";' \
               'git remote update;' \
               'git checkout -b %(src_branch)s upstream/%(dest_branch)s; ' % {
                   "repo_dir": self.repo_dir,
-                  "gitee_user": self.gitee_user,
-                  "gitee_email": self.gitee_email,
-                  "gitee_org": self.gitee_org,
+                  "atomgit_user": self.atomgit_user,
+                  "atomgit_email": self.atomgit_email,
+                  "atomgit_org": self.atomgit_org,
                   "repo_name": self.repo_name,
                   "src_branch": src_branch,
                   "dest_branch": dest_branch}
@@ -103,19 +103,19 @@ class PkgGitRepo(object):
 
     def commit(self, commit_message, do_push=True, amend=False):
         click.echo("Commit changes for %s/%s" % (
-            self.gitee_org, self.repo_name))
+            self.atomgit_org, self.repo_name))
         _commit_cmd = 'git commit -am "%(commit_message)s";'
         if amend:
               _commit_cmd = 'git commit --amend -m "%(commit_message)s";'
         commit_cmd = 'cd %(repo_dir)s/; ' \
                      'git add .; ' \
                      f"{_commit_cmd}" \
-                     'git remote set-url origin https://%(gitee_user)s:' \
-                     '%(gitee_pat)s@gitee.com/%(gitee_user)s/%(repo_name)s;' \
+                     'git remote set-url origin https://%(atomgit_user)s:' \
+                     '%(atomgit_pat)s@atomgit.com/%(atomgit_user)s/%(repo_name)s;' \
                      % {"repo_dir": self.repo_dir,
                         "repo_name": self.repo_name,
-                        "gitee_user": self.gitee_user,
-                        "gitee_pat": self.gitee_pat,
+                        "atomgit_user": self.atomgit_user,
+                        "atomgit_pat": self.atomgit_pat,
                         "commit_message": commit_message}
         if do_push:
             commit_cmd += 'git push origin -f'
@@ -130,12 +130,12 @@ class PkgGitRepo(object):
             return
         click.echo("Creating pull request for project: %s" % self.repo_name)
         try:
-            url = "https://gitee.com/api/v5/repos/%s/%s/pulls" % (
-                self.gitee_org, self.repo_name)
+            url = "https://atomgit.com/api/v5/repos/%s/%s/pulls" % (
+                self.atomgit_org, self.repo_name)
             resp = requests.request(
-                "POST", url, data={"access_token": self.gitee_pat,
+                "POST", url, data={"access_token": self.atomgit_pat,
                                    "title": title,
-                                   "head": self.gitee_user + ":" + src_branch,
+                                   "head": self.atomgit_user + ":" + src_branch,
                                    "base": remote_branch})
             if resp.status_code != 201:
                 click.echo("Create pull request failed, %s" % resp.text)
@@ -145,22 +145,21 @@ class PkgGitRepo(object):
             except Exception:
                 click.echo('please get pr number manual')
         except requests.RequestException as e:
-            click.echo("HTTP request to gitee failed: %s" % e, err=True)
+            click.echo("HTTP request to atomgit failed: %s" % e, err=True)
 
     def delete_fork(self):
-        url = 'https://gitee.com/api/v5/repos/%s/%s?access_token=%s' % (
-            self.gitee_user, self.repo_name, self.gitee_pat)
+        url = 'https://atomgit.com/api/v5/repos/%s/%s?access_token=%s' % (
+            self.atomgit_user, self.repo_name, self.atomgit_pat)
         resp = requests.request("DELETE", url)
         if resp.status_code == 404:
             click.echo("Repo %s/%s not found" % (
-                self.gitee_user, self.repo_name))
-
+                self.atomgit_user, self.repo_name))
     def pr_add_comment(self, comment, pr_num):
         click.echo("Adding comment: %s for project: %s in PR: %s" % (
             comment, self.repo_name, pr_num))
-        url = 'https://gitee.com/api/v5/repos/%s/%s/pulls/%s/comments' % (
-            self.gitee_org, self.repo_name, pr_num)
-        body = {"access_token": "%s" % self.gitee_pat,
+        url = 'https://atomgit.com/api/v5/repos/%s/%s/pulls/%s/comments' % (
+            self.atomgit_org, self.repo_name, pr_num)
+        body = {"access_token": "%s" % self.atomgit_pat,
                 "body": "%s" % comment}
         resp = requests.request("POST", url, data=body)
         if resp.status_code != 201:
@@ -169,9 +168,9 @@ class PkgGitRepo(object):
     
     def pr_get_comments(self, pr_num):
         click.echo("Getting comments for %s/%s in PR: %s" % (
-            self.gitee_org, self.repo_name, pr_num))
-        url = 'https://gitee.com/api/v5/repos/%s/%s/pulls/%s/comments' % (
-            self.gitee_org, self.repo_name, pr_num)
+            self.atomgit_org, self.repo_name, pr_num))
+        url = 'https://atomgit.com/api/v5/repos/%s/%s/pulls/%s/comments' % (
+            self.atomgit_org, self.repo_name, pr_num)
         param = {'comment_type': 'pr_comment', 'direction': 'desc'}
         resp = requests.get(url, params=param)
         if resp.status_code != 200:
@@ -181,9 +180,9 @@ class PkgGitRepo(object):
 
     def get_pr_list(self, filter=None):
         click.echo("Getting PR list for %s/%s" % (
-            self.gitee_org, self.repo_name))
-        url = 'https://gitee.com/api/v5/repos/%s/%s/pulls?access_token=%s' % (
-            self.gitee_org, self.repo_name, self.gitee_pat)
+            self.atomgit_org, self.repo_name))
+        url = 'https://atomgit.com/api/v5/repos/%s/%s/pulls?access_token=%s' % (
+            self.atomgit_org, self.repo_name, self.atomgit_pat)
         resp = requests.get(url, params=filter)
         if resp.status_code != 200:
             click.echo("Getting PR list failed, reason: %s" % resp.reason,
@@ -192,13 +191,13 @@ class PkgGitRepo(object):
 
     def branch_version_list(self, suffix, keyword):
         try:
-            # https://gitee.com/api/v5/repos/{owner}/{repo}/branches
-            br_url = 'https://gitee.com/api/v5/repos/%s/%s/branches' % (
-                    self.gitee_org, self.repo_name)
+            # https://atomgit.com/api/v5/repos/{owner}/{repo}/branches
+            br_url = 'https://atomgit.com/api/v5/repos/%s/%s/branches' % (
+                    self.atomgit_org, self.repo_name)
             resp = requests.request('GET', br_url,
-                                    data={'access_token': self.gitee_pat})
+                                    data={'access_token': self.atomgit_pat})
         except requests.RequestException as e:
-            click.echo("HTTP request to gitee failed: %s" % e, err=True)
+            click.echo("HTTP request to atomgit failed: %s" % e, err=True)
             return
 
         res = ''
@@ -214,15 +213,15 @@ class PkgGitRepo(object):
                 if keyword and keyword not in br:
                     continue
 
-                # https://gitee.com/api/v5/repos/{owner}/{repo}/contents(/{path})
-                url = 'https://gitee.com/api/v5/repos/%s/%s/contents/' % (
-                        self.gitee_org, 
+                # https://atomgit.com/api/v5/repos/{owner}/{repo}/contents(/{path})
+                url = 'https://atomgit.com/api/v5/repos/%s/%s/contents/' % (
+                        self.atomgit_org, 
                         self.repo_name)
                 headers = {
                     'Content-Type': 'application/json;charset=UTF-8',
                 }
                 params = {
-                    'access_token': self.gitee_pat,
+                    'access_token': self.atomgit_pat,
                     'ref': br
                 }
 
@@ -268,7 +267,7 @@ class PkgGitRepo(object):
             res = subprocess.check_output(['git', 'config', '--list']).decode()
             p_start = res.find('user.name') + 10
             p_end = res.find('\n', p_start)
-            self.gitee_user = res[p_start:p_end]
+            self.atomgit_user = res[p_start:p_end]
 
             res = subprocess.check_output(['git', 'branch']).decode()
             p_start = res.find('* ') + 2
@@ -298,8 +297,8 @@ class PkgGitRepo(object):
 
             if pr_num and comment:
                 self.pr_add_comment(comment, pr_num)
-                pr_link = 'PR link:\nhttps://gitee.com/%s/%s/pulls/%s' % (
-                    self.gitee_org, self.repo_name, pr_num
+                pr_link = 'PR link:\nhttps://atomgit.com/%s/%s/pulls/%s' % (
+                    self.atomgit_org, self.repo_name, pr_num
                 )
                 click.echo(pr_link)
 
@@ -331,7 +330,7 @@ class PkgGitRepo(object):
         for dirpath, dirnames, files in os.walk(cur_path):
             for file in files:
                 abspath = os.path.join(dirpath, file)
-                if abspath.find(self.gitee_org) == -1 and \
+                if abspath.find(self.atomgit_org) == -1 and \
                     not abspath.endswith('.yaml'):
                     continue
 
