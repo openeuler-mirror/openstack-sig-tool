@@ -651,4 +651,4 @@ rpmdev-setuptree
 
 在执行`oos spec build`命令时可以指定`--build-root`参数为`rpmbuild`工作目录的根目录，默认为当前用户目录下`rpmbuild/`目录。
 
-另外，为了便于使用该工具，可以使用`Docker`快速构建一个打包环境，具体详见`docker/`目录下的[README](https://gitee.com/openeuler/openstack/blob/master/tools/docker/README.md).
+另外，为了便于使用该工具，可以使用`Docker`快速构建一个打包环境，具体详见`docker/`目录下的[README](https://atomgit.com/openeuler/openstack/blob/master/tools/docker/README.md).
