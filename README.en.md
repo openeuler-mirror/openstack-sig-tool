@@ -644,4 +644,4 @@ rpmdev-setuptree
 
 When executing `oos spec build`, you can specify the `--build-root` parameter pointing to the root directory of the `rpmbuild` working tree. By default, it uses the `rpmbuild/` directory under the current user's home directory.
 
-In addition, to make it easier to use the tool, you can use Docker to quickly build a packaging environment. For details, see the [README](https://gitee.com/openeuler/openstack/blob/master/tools/docker/README.md) in the `docker/` directory.
+In addition, to make it easier to use the tool, you can use Docker to quickly build a packaging environment. For details, see the [README](https://atomgit.com/openeuler/openstack/blob/master/tools/docker/README.md) in the `docker/` directory.
