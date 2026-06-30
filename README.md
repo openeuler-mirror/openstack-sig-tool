@@ -478,7 +478,7 @@ oos env list
 
 该命令所支持参数如下：
 不带任何参数，查看使用oos工具部署OpenStack的环境信息  
-可参考[基于OpenStack SIG开发工具oos快速部署](https://openeuler.gitee.io/openstack/install/openEuler-22.03-LTS-SP2/OpenStack-wallaby/#openstack-sigoos)
+可参考[基于OpenStack SIG开发工具oos快速部署](https://atomgit.com/openeuler/openstack-docs/blob/master/docs/zh/install/wallaby.md#%E5%9F%BA%E4%BA%8Eopenstack-sig%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7oos%E5%BF%AB%E9%80%9F%E9%83%A8%E7%BD%B2)
 
 ``` shell script
 -r, --remote
