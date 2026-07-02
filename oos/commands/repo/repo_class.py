@@ -53,7 +53,7 @@ class PkgGitRepo(object):
                                                           repo_name),
                            err=True)
                 self.not_found = True
-            elif resp.status_code != 201:
+            elif resp.status_code != 200:
                 click.echo("Fork repo %s failed, %s" % (repo_name, resp.text), err=True)
         except requests.RequestException as e:
             click.echo("HTTP request to atomgit failed: %s" % e, err=True)
@@ -137,7 +137,7 @@ class PkgGitRepo(object):
                                    "title": title,
                                    "head": self.atomgit_user + ":" + src_branch,
                                    "base": remote_branch})
-            if resp.status_code != 201:
+            if resp.status_code != 200:
                 click.echo("Create pull request failed, %s" % resp.text)
                 return
             try:
@@ -162,7 +162,7 @@ class PkgGitRepo(object):
         body = {"access_token": "%s" % self.atomgit_pat,
                 "body": "%s" % comment}
         resp = requests.request("POST", url, data=body)
-        if resp.status_code != 201:
+        if resp.status_code != 200:
             click.echo("Comment PR %s failed, reason: %s" %
                        (pr_num, resp.reason), err=True)
     
